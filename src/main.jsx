@@ -270,17 +270,25 @@ function buildCareer(rows, type) {
   }
   const ab = sum("ab");
   const h = sum("h");
+  const bb = sum("bb");
+  const doubles = sum("doubles");
+  const triples = sum("triples");
+  const hr = sum("hr");
+  const totalBases = h + doubles + triples * 2 + hr * 3;
+  const obpDenominator = ab + bb;
+  const obp = obpDenominator ? (h + bb) / obpDenominator : null;
+  const slg = ab ? totalBases / ab : null;
   return {
     player: rows[0].player,
     ab,
     r: sum("r"),
     h,
-    hr: sum("hr"),
+    hr,
     rbi: sum("rbi"),
     sb: sum("sb"),
     avg: ab ? (h / ab).toFixed(3).replace(/^0/, "") : "-",
-    obp: "-",
-    ops: "-",
+    obp: obp === null ? "-" : obp.toFixed(3).replace(/^0/, ""),
+    ops: obp === null || slg === null ? "-" : (obp + slg).toFixed(3).replace(/^0/, ""),
   };
 }
 
