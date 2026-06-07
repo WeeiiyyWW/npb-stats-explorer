@@ -3,6 +3,10 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, "public", "data");
+const YEAR_DATA_DIR = {
+  batting: path.join(DATA_DIR, "batting"),
+  pitching: path.join(DATA_DIR, "pitching"),
+};
 const CURRENT_YEAR = new Date().getFullYear();
 
 const TABLES = {
@@ -29,37 +33,37 @@ const TABLES = {
 };
 
 const TEAM_MAP = new Map([
-  ["巨人", { id: "giants", code: "G" }],
-  ["読売ジャイアンツ", { id: "giants", code: "G" }],
-  ["タイガース", { id: "tigers", code: "T" }],
-  ["阪神タイガース", { id: "tigers", code: "T" }],
-  ["ベイスターズ", { id: "baystars", code: "DB" }],
-  ["横浜ベイスターズ", { id: "baystars", code: "DB" }],
-  ["横浜DeNAベイスターズ", { id: "baystars", code: "DB" }],
-  ["カープ", { id: "carp", code: "C" }],
-  ["広島東洋カープ", { id: "carp", code: "C" }],
-  ["スワローズ", { id: "swallows", code: "S" }],
-  ["ヤクルトスワローズ", { id: "swallows", code: "S" }],
-  ["東京ヤクルトスワローズ", { id: "swallows", code: "S" }],
-  ["ドラゴンズ", { id: "dragons", code: "D" }],
-  ["中日ドラゴンズ", { id: "dragons", code: "D" }],
-  ["ホークス", { id: "hawks", code: "H" }],
-  ["福岡ダイエーホークス", { id: "hawks", code: "H" }],
-  ["福岡ソフトバンクホークス", { id: "hawks", code: "H" }],
-  ["ファイターズ", { id: "fighters", code: "F" }],
-  ["日本ハムファイターズ", { id: "fighters", code: "F" }],
-  ["北海道日本ハムファイターズ", { id: "fighters", code: "F" }],
-  ["マリーンズ", { id: "marines", code: "M" }],
-  ["千葉ロッテマリーンズ", { id: "marines", code: "M" }],
-  ["イーグルス", { id: "eagles", code: "E" }],
-  ["東北楽天ゴールデンイーグルス", { id: "eagles", code: "E" }],
-  ["バファローズ", { id: "buffaloes", code: "B" }],
-  ["大阪近鉄バファローズ", { id: "buffaloes", code: "B" }],
-  ["オリックス・ブルーウェーブ", { id: "buffaloes", code: "B" }],
-  ["オリックス・バファローズ", { id: "buffaloes", code: "B" }],
-  ["ライオンズ", { id: "lions", code: "L" }],
-  ["西武ライオンズ", { id: "lions", code: "L" }],
-  ["埼玉西武ライオンズ", { id: "lions", code: "L" }],
+  ["巨人", { id: "giants", code: "巨" }],
+  ["読売ジャイアンツ", { id: "giants", code: "巨" }],
+  ["タイガース", { id: "tigers", code: "神" }],
+  ["阪神タイガース", { id: "tigers", code: "神" }],
+  ["ベイスターズ", { id: "baystars", code: "デ" }],
+  ["横浜ベイスターズ", { id: "baystars", code: "横" }],
+  ["横浜DeNAベイスターズ", { id: "baystars", code: "デ" }],
+  ["カープ", { id: "carp", code: "広" }],
+  ["広島東洋カープ", { id: "carp", code: "広" }],
+  ["スワローズ", { id: "swallows", code: "ヤ" }],
+  ["ヤクルトスワローズ", { id: "swallows", code: "ヤ" }],
+  ["東京ヤクルトスワローズ", { id: "swallows", code: "ヤ" }],
+  ["ドラゴンズ", { id: "dragons", code: "中" }],
+  ["中日ドラゴンズ", { id: "dragons", code: "中" }],
+  ["ホークス", { id: "hawks", code: "ソ" }],
+  ["福岡ダイエーホークス", { id: "hawks", code: "ダ" }],
+  ["福岡ソフトバンクホークス", { id: "hawks", code: "ソ" }],
+  ["ファイターズ", { id: "fighters", code: "日" }],
+  ["日本ハムファイターズ", { id: "fighters", code: "日" }],
+  ["北海道日本ハムファイターズ", { id: "fighters", code: "日" }],
+  ["マリーンズ", { id: "marines", code: "ロ" }],
+  ["千葉ロッテマリーンズ", { id: "marines", code: "ロ" }],
+  ["イーグルス", { id: "eagles", code: "楽" }],
+  ["東北楽天ゴールデンイーグルス", { id: "eagles", code: "楽" }],
+  ["バファローズ", { id: "buffaloes", code: "オ" }],
+  ["大阪近鉄バファローズ", { id: "buffaloes", code: "近" }],
+  ["オリックス・ブルーウェーブ", { id: "buffaloes", code: "ブ" }],
+  ["オリックス・バファローズ", { id: "buffaloes", code: "オ" }],
+  ["ライオンズ", { id: "lions", code: "西" }],
+  ["西武ライオンズ", { id: "lions", code: "西" }],
+  ["埼玉西武ライオンズ", { id: "lions", code: "西" }],
 ]);
 
 function clean(value) {
@@ -86,6 +90,13 @@ function rate(value) {
 function numberText(value) {
   const text = clean(value);
   return text || "-";
+}
+
+function twoDecimalText(value) {
+  const text = clean(value);
+  if (!text || text === "-") return "-";
+  const numeric = Number(text);
+  return Number.isFinite(numeric) ? numeric.toFixed(2) : text;
 }
 
 function normalizeTeam(shortTeam, longTeam = "") {
@@ -232,16 +243,18 @@ function normalizePitcher(row) {
     ip: numberText(row[13]),
     w: numberText(row[7]),
     l: numberText(row[8]),
-    era: numberText(row[15]),
-    whip: numberText(row[16]),
+    era: twoDecimalText(row[15]),
+    whip: twoDecimalText(row[16]),
+    h: numberText(row[25]),
+    er: numberText(row[27]),
     hld: numberText(row[10]),
     sv: numberText(row[9]),
     so: numberText(row[29]),
     bb: numberText(row[30]),
-    k9: numberText(row[21]),
-    bb9: numberText(row[22]),
-    kbb: numberText(row[23]),
-    hr9: numberText(row[20]),
+    k9: twoDecimalText(row[21]),
+    bb9: twoDecimalText(row[22]),
+    kbb: twoDecimalText(row[23]),
+    hr9: twoDecimalText(row[20]),
   };
 }
 
@@ -261,7 +274,9 @@ async function updateOne(kind) {
     updatedAt: new Date().toISOString(),
     rows,
   }, null, 2)}\n`;
+  await mkdir(YEAR_DATA_DIR[kind], { recursive: true });
   await writeFile(path.join(DATA_DIR, config.output), payload);
+  await writeFile(path.join(YEAR_DATA_DIR[kind], `${CURRENT_YEAR}.json`), payload);
   if (config.legacyOutput) {
     await writeFile(path.join(DATA_DIR, config.legacyOutput), payload);
   }

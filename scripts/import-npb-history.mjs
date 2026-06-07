@@ -3,29 +3,33 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const DATA_DIR = path.join(ROOT, "public", "data");
+const YEAR_DATA_DIR = {
+  batting: path.join(DATA_DIR, "batting"),
+  pitching: path.join(DATA_DIR, "pitching"),
+};
 const START_YEAR = 2000;
 const END_YEAR = 2025;
 
 const TEAM_MAP = new Map([
-  ["読売ジャイアンツ", { id: "giants", code: "G" }],
-  ["阪神タイガース", { id: "tigers", code: "T" }],
-  ["横浜DeNAベイスターズ", { id: "baystars", code: "DB" }],
-  ["横浜ベイスターズ", { id: "baystars", code: "DB" }],
-  ["広島東洋カープ", { id: "carp", code: "C" }],
-  ["東京ヤクルトスワローズ", { id: "swallows", code: "S" }],
-  ["ヤクルトスワローズ", { id: "swallows", code: "S" }],
-  ["中日ドラゴンズ", { id: "dragons", code: "D" }],
-  ["福岡ソフトバンクホークス", { id: "hawks", code: "H" }],
-  ["福岡ダイエーホークス", { id: "hawks", code: "H" }],
-  ["北海道日本ハムファイターズ", { id: "fighters", code: "F" }],
-  ["日本ハムファイターズ", { id: "fighters", code: "F" }],
-  ["千葉ロッテマリーンズ", { id: "marines", code: "M" }],
-  ["東北楽天ゴールデンイーグルス", { id: "eagles", code: "E" }],
-  ["オリックス・バファローズ", { id: "buffaloes", code: "B" }],
-  ["オリックス・ブルーウェーブ", { id: "buffaloes", code: "B" }],
-  ["大阪近鉄バファローズ", { id: "buffaloes", code: "B" }],
-  ["埼玉西武ライオンズ", { id: "lions", code: "L" }],
-  ["西武ライオンズ", { id: "lions", code: "L" }],
+  ["読売ジャイアンツ", { id: "giants", code: "巨", imageCode: "巨" }],
+  ["阪神タイガース", { id: "tigers", code: "神", imageCode: "神" }],
+  ["横浜DeNAベイスターズ", { id: "baystars", code: "デ", imageCode: "デ" }],
+  ["横浜ベイスターズ", { id: "baystars", code: "横", imageCode: "横" }],
+  ["広島東洋カープ", { id: "carp", code: "広", imageCode: "広" }],
+  ["東京ヤクルトスワローズ", { id: "swallows", code: "ヤ", imageCode: "ヤ" }],
+  ["ヤクルトスワローズ", { id: "swallows", code: "ヤ", imageCode: "ヤ" }],
+  ["中日ドラゴンズ", { id: "dragons", code: "中", imageCode: "中" }],
+  ["福岡ソフトバンクホークス", { id: "hawks", code: "ソ", imageCode: "ソ" }],
+  ["福岡ダイエーホークス", { id: "hawks", code: "ダ", imageCode: "ダ" }],
+  ["北海道日本ハムファイターズ", { id: "fighters", code: "日", imageCode: "日" }],
+  ["日本ハムファイターズ", { id: "fighters", code: "日", imageCode: "日" }],
+  ["千葉ロッテマリーンズ", { id: "marines", code: "ロ", imageCode: "ロ" }],
+  ["東北楽天ゴールデンイーグルス", { id: "eagles", code: "楽", imageCode: "楽" }],
+  ["オリックス・バファローズ", { id: "buffaloes", code: "オ", imageCode: "オ" }],
+  ["オリックス・ブルーウェーブ", { id: "buffaloes", code: "ブ", imageCode: "ブ" }],
+  ["大阪近鉄バファローズ", { id: "buffaloes", code: "近", imageCode: "近" }],
+  ["埼玉西武ライオンズ", { id: "lions", code: "西", imageCode: "西" }],
+  ["西武ライオンズ", { id: "lions", code: "西", imageCode: "西" }],
 ]);
 
 function clean(value) {
@@ -50,12 +54,25 @@ function numberText(value) {
   return text || "-";
 }
 
+function twoDecimalText(value) {
+  const text = clean(value);
+  if (!text || text === "-") return "-";
+  const numeric = Number(text);
+  return Number.isFinite(numeric) ? numeric.toFixed(2) : text;
+}
+
 function normalizeTeam(teamName) {
   const team = TEAM_MAP.get(clean(teamName));
   return {
     teamId: team?.id || clean(teamName),
     teamCode: team?.code || clean(teamName),
+    imageCode: team?.imageCode || clean(teamName),
   };
+}
+
+function playerImageUrl({ year, teamImageCode, number, playerId }) {
+  if (!year || !teamImageCode || !number || !playerId) return "";
+  return `https://proeyekyuu.com/wp-content/uploads/PlayerPictures/${year}/${year}_${teamImageCode}_${String(number).padStart(3, "0")}_${playerId}.jpg`;
 }
 
 function parseCsv(text) {
@@ -125,7 +142,12 @@ function normalizeBatter(row) {
     team: clean(row["球団"]),
     teamCode: mapped.teamCode,
     year: clean(row["シーズン"]),
-    imageUrl: "",
+    imageUrl: playerImageUrl({
+      year: clean(row["シーズン"]),
+      teamImageCode: mapped.imageCode,
+      number: clean(row["#"]),
+      playerId: clean(row.PlayerID),
+    }),
     g: numberText(row["試合"]),
     pa: numberText(row["打席"]),
     ab: numberText(row["打数"]),
@@ -155,22 +177,29 @@ function normalizePitcher(row) {
     team: clean(row["球団"]),
     teamCode: mapped.teamCode,
     year: clean(row["シーズン"]),
-    imageUrl: "",
+    imageUrl: playerImageUrl({
+      year: clean(row["シーズン"]),
+      teamImageCode: mapped.imageCode,
+      number: clean(row["#"]),
+      playerId: clean(row.PlayerID),
+    }),
     g: numberText(row["登板"]),
     gs: numberText(row.GS),
     ip: numberText(row["投球回"]),
     w: numberText(row["勝利"]),
     l: numberText(row["敗北"]),
-    era: numberText(row["防御率"]),
-    whip: numberText(row.WHIP),
+    era: twoDecimalText(row["防御率"]),
+    whip: twoDecimalText(row.WHIP),
+    h: numberText(row["安打"]),
+    er: numberText(row["自責点"]),
     hld: numberText(row["ホールド"]),
     sv: numberText(row["セーブ"]),
     so: numberText(row["三振"]),
     bb: numberText(row["四球"]),
-    k9: numberText(row["K/9"]),
-    bb9: numberText(row["BB/9"]),
-    kbb: numberText(row["K/BB"]),
-    hr9: numberText(row["HR/9"]),
+    k9: twoDecimalText(row["K/9"]),
+    bb9: twoDecimalText(row["BB/9"]),
+    kbb: twoDecimalText(row["K/BB"]),
+    hr9: twoDecimalText(row["HR/9"]),
   };
 }
 
@@ -185,6 +214,7 @@ function uniqueRows(rows) {
 
 async function importKind(kind) {
   const rows = [];
+  const rowsByYear = new Map();
   const folder = kind === "batting" ? "PlayerSLBattingJP" : "PlayerSLPitchingJP";
   const filename = kind === "batting" ? "player_batting_stats_jp" : "player_pitching_stats_jp";
   const normalize = kind === "batting" ? normalizeBatter : normalizePitcher;
@@ -197,6 +227,7 @@ async function importKind(kind) {
       .map(normalize)
       .filter((row) => row.player && row.year && row.team);
     rows.push(...officialRows);
+    rowsByYear.set(String(year), uniqueRows(officialRows));
     console.log(`${kind} ${year}: ${officialRows.length} rows`);
   }
 
@@ -208,7 +239,16 @@ async function importKind(kind) {
   };
 
   await mkdir(DATA_DIR, { recursive: true });
+  await mkdir(YEAR_DATA_DIR[kind], { recursive: true });
   await writeFile(path.join(DATA_DIR, output), `${JSON.stringify(payload, null, 2)}\n`);
+  for (const [year, yearRows] of rowsByYear) {
+    const yearPayload = {
+      source: `https://proeyekyuu.com/ja/csvs-jp/ ${year}`,
+      updatedAt: payload.updatedAt,
+      rows: yearRows,
+    };
+    await writeFile(path.join(YEAR_DATA_DIR[kind], `${year}.json`), `${JSON.stringify(yearPayload, null, 2)}\n`);
+  }
   console.log(`Wrote ${payload.rows.length} ${kind} rows to ${output}`);
 }
 
