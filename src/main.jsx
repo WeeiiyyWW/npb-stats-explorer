@@ -31,11 +31,39 @@ const TEAM_OPTIONS = [
 ];
 
 const TEAM_ALIASES = new Map(
-  TEAM_OPTIONS.flatMap((team) => [
+  [
+    ...TEAM_OPTIONS.flatMap((team) => [
     [team.id.toLowerCase(), team],
     [team.name.toLowerCase(), team],
     [team.fullName.toLowerCase(), team],
-  ])
+    [team.abbr.toLowerCase(), team],
+  ]),
+    ["巨人", TEAM_OPTIONS[0]],
+    ["読売ジャイアンツ", TEAM_OPTIONS[0]],
+    ["タイガース", TEAM_OPTIONS[1]],
+    ["阪神タイガース", TEAM_OPTIONS[1]],
+    ["ベイスターズ", TEAM_OPTIONS[2]],
+    ["横浜denaベイスターズ", TEAM_OPTIONS[2]],
+    ["横浜dena baystars", TEAM_OPTIONS[2]],
+    ["カープ", TEAM_OPTIONS[3]],
+    ["広島東洋カープ", TEAM_OPTIONS[3]],
+    ["スワローズ", TEAM_OPTIONS[4]],
+    ["東京ヤクルトスワローズ", TEAM_OPTIONS[4]],
+    ["ドラゴンズ", TEAM_OPTIONS[5]],
+    ["中日ドラゴンズ", TEAM_OPTIONS[5]],
+    ["ホークス", TEAM_OPTIONS[6]],
+    ["福岡ソフトバンクホークス", TEAM_OPTIONS[6]],
+    ["ファイターズ", TEAM_OPTIONS[7]],
+    ["北海道日本ハムファイターズ", TEAM_OPTIONS[7]],
+    ["マリーンズ", TEAM_OPTIONS[8]],
+    ["千葉ロッテマリーンズ", TEAM_OPTIONS[8]],
+    ["イーグルス", TEAM_OPTIONS[9]],
+    ["東北楽天ゴールデンイーグルス", TEAM_OPTIONS[9]],
+    ["バファローズ", TEAM_OPTIONS[10]],
+    ["オリックス・バファローズ", TEAM_OPTIONS[10]],
+    ["ライオンズ", TEAM_OPTIONS[11]],
+    ["埼玉西武ライオンズ", TEAM_OPTIONS[11]],
+  ]
 );
 
 const TEAM_OPTIONS_BY_LEAGUE = LEAGUE_OPTIONS.reduce((acc, { value }) => {
