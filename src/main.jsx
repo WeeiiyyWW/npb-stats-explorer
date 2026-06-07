@@ -95,20 +95,31 @@ const PITCHER_TABLE = {
 
 const dataCache = new Map();
 
-async function fetchData(type) {
-  if (dataCache.has(type)) return dataCache.get(type);
-  const files = type === "pitchers"
-    ? ["npb-pitching-history.json", "npb-pitching-current.json"]
-    : ["npb-batting-history.json", "npb-batting-current.json"];
-  const request = Promise.all(files.map((file) => (
-    fetch(`/data/${file}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Unable to load ${file}`);
-        return res.json();
-      })
-      .then((payload) => payload.rows || [])
-  ))).then((groups) => groups.flat());
-  dataCache.set(type, request);
+function dataPath(type, year) {
+  return `/data/${type === "pitchers" ? "pitching" : "batting"}/${year}.json`;
+}
+
+async function fetchYearData(type, year) {
+  const cacheKey = `${type}-${year}`;
+  if (dataCache.has(cacheKey)) return dataCache.get(cacheKey);
+  const path = dataPath(type, year);
+  const request = fetch(path)
+    .then((res) => {
+      if (!res.ok) throw new Error(`Unable to load ${path}`);
+      return res.json();
+    })
+    .then((payload) => payload.rows || []);
+  dataCache.set(cacheKey, request);
+  return request;
+}
+
+async function fetchAllData(type) {
+  const cacheKey = `${type}-all`;
+  if (dataCache.has(cacheKey)) return dataCache.get(cacheKey);
+  const request = Promise.all(
+    SEASONS.map((season) => fetchYearData(type, String(season)).catch(() => []))
+  ).then((groups) => groups.flat());
+  dataCache.set(cacheKey, request);
   return request;
 }
 
@@ -143,6 +154,19 @@ function sortRows(rows, sortConfig) {
       : String(av).localeCompare(String(bv));
     return sortConfig.direction === "asc" ? result : -result;
   });
+}
+
+function parseInnings(value) {
+  if (value === null || value === undefined || value === "" || value === "-") return 0;
+  const [whole = "0", outs = "0"] = String(value).split(".");
+  return Number(whole || 0) + Number(outs || 0) / 3;
+}
+
+function formatInnings(value) {
+  if (!Number.isFinite(value) || value <= 0) return "-";
+  const whole = Math.floor(value);
+  const outs = Math.round((value - whole) * 3);
+  return `${whole}.${outs}`;
 }
 
 function SelectField({ label, value, onChange, options, placeholder }) {
@@ -227,6 +251,10 @@ function buildCareer(rows, type) {
   if (!rows.length) return null;
   const sum = (key) => rows.reduce((total, row) => total + Number(row[key] || 0), 0);
   if (type === "pitchers") {
+    const innings = rows.reduce((total, row) => total + parseInnings(row.ip), 0);
+    const er = sum("er");
+    const hits = sum("h");
+    const walks = sum("bb");
     return {
       player: rows[0].player,
       w: sum("w"),
@@ -235,9 +263,9 @@ function buildCareer(rows, type) {
       gs: sum("gs"),
       sv: sum("sv"),
       so: sum("so"),
-      ip: rows.reduce((total, row) => total + Number(String(row.ip || 0).replace(".1", ".333").replace(".2", ".667")), 0).toFixed(1),
-      era: "-",
-      whip: "-",
+      ip: formatInnings(innings),
+      era: innings ? ((er * 9) / innings).toFixed(2) : "-",
+      whip: innings ? ((hits + walks) / innings).toFixed(2) : "-",
     };
   }
   const ab = sum("ab");
@@ -270,25 +298,20 @@ function App() {
   const [activeYear, setActiveYear] = useState(defaultYear);
   const [activeType, setActiveType] = useState(defaultType);
   const [hasResults, setHasResults] = useState(true);
-  const [allRows, setAllRows] = useState([]);
   const [seasonRows, setSeasonRows] = useState([]);
   const [loadingSeason, setLoadingSeason] = useState(false);
   const [seasonError, setSeasonError] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "pa", direction: "desc" });
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [detailRows, setDetailRows] = useState([]);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   const filteredTeams = useMemo(() => TEAM_OPTIONS_BY_LEAGUE[pendingLeague] || [], [pendingLeague]);
   const yearOptions = useMemo(() => SEASONS.map((season) => ({ value: String(season), label: String(season) })), []);
   const activeTeam = useMemo(() => getTeam(activeTeamId), [activeTeamId]);
   const tableConfig = activeType === "pitchers" ? PITCHER_TABLE : HITTER_TABLE;
   const sortedMainRows = useMemo(() => sortRows(seasonRows, sortConfig), [seasonRows, sortConfig]);
-  const detailRows = useMemo(() => {
-    if (!selectedPlayer) return [];
-    return allRows
-      .filter((row) => row.personId === selectedPlayer.personId)
-      .sort((a, b) => Number(b.year) - Number(a.year));
-  }, [allRows, selectedPlayer]);
   const careerStats = useMemo(() => buildCareer(detailRows, activeType), [detailRows, activeType]);
 
   const handleLeagueChange = (league) => {
@@ -310,15 +333,15 @@ function App() {
     setSeasonError("");
     setDetailOpen(false);
     setSelectedPlayer(null);
+    setDetailRows([]);
     setHasResults(true);
 
     try {
-      const rows = await fetchData(type);
+      const rows = await fetchYearData(type, year);
       const filtered = rows.filter((row) => {
         const rowTeam = findTeam(row.teamId || row.team || row.teamCode);
         return String(row.year) === String(year) && rowTeam?.id === team?.id;
       });
-      setAllRows(rows);
       setSeasonRows(filtered);
       setActiveTeamId(teamId);
       setActiveYear(year);
@@ -332,6 +355,24 @@ function App() {
     }
   };
 
+  const openPlayerDetail = async (row) => {
+    setSelectedPlayer(row);
+    setDetailOpen(true);
+    setLoadingDetail(true);
+    setDetailRows([row]);
+
+    try {
+      const rows = await fetchAllData(activeType);
+      setDetailRows(rows
+        .filter((item) => item.personId === row.personId)
+        .sort((a, b) => Number(b.year) - Number(a.year)));
+    } catch (error) {
+      setDetailRows([row]);
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
   const clearFilters = () => {
     setPendingLeague(defaultLeague);
     setPendingTeamId(defaultTeamId);
@@ -341,6 +382,7 @@ function App() {
     setSeasonError("");
     setDetailOpen(false);
     setSelectedPlayer(null);
+    setDetailRows([]);
     setHasResults(false);
     setActiveTeamId("");
     setActiveYear("");
@@ -391,7 +433,7 @@ function App() {
             ) : !hasResults ? (
               <div className="message">No data loaded.</div>
             ) : (
-              <DataTable config={tableConfig} rows={sortedMainRows} emptyText="No data found." onSort={(key) => setSortConfig((prev) => ({ key, direction: getNextDirection(prev, key) }))} sortConfig={sortConfig} onPlayerClick={(row) => { setSelectedPlayer(row); setDetailOpen(true); }} />
+              <DataTable config={tableConfig} rows={sortedMainRows} emptyText="No data found." onSort={(key) => setSortConfig((prev) => ({ key, direction: getNextDirection(prev, key) }))} sortConfig={sortConfig} onPlayerClick={(row) => void openPlayerDetail(row)} />
             )}
           </section>
         </div>
@@ -411,12 +453,20 @@ function App() {
                 </div>
                 <div className="careerPanel">
                   <p>Career Stats</p>
-                  <CareerGrid cards={tableConfig.careerCards} career={careerStats} />
+                  {loadingDetail ? (
+                    <div className="detailLoading"><Loader2 className="miniSpinner" /> Loading...</div>
+                  ) : (
+                    <CareerGrid cards={tableConfig.careerCards} career={careerStats} />
+                  )}
                 </div>
               </div>
             </div>
             <div className="detailBody">
-              <DataTable config={tableConfig} rows={detailRows} emptyText="No historical stats found." sortConfig={null} />
+              {loadingDetail ? (
+                <div className="message"><Loader2 className="spinner" /><span>Loading player history...</span></div>
+              ) : (
+                <DataTable config={tableConfig} rows={detailRows} emptyText="No historical stats found." sortConfig={null} />
+              )}
             </div>
           </div>
         )}
