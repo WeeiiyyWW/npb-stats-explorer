@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { ChevronDown, ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronLeft, Loader2, RotateCcw, Search } from "lucide-react";
 import "./styles.css";
 
 const START_YEAR = 2000;
@@ -170,25 +170,67 @@ function formatInnings(value) {
 }
 
 function SelectField({ label, value, onChange, options, placeholder }) {
+  const [open, setOpen] = useState(false);
+  const selected = options.find((option) => option.value === value);
+
   return (
     <div className="field">
       <label>{label}</label>
       <div className="selectWrap">
-        <select value={value} onChange={(event) => onChange(event.target.value)}>
-          <option value="">{placeholder}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </select>
-        <ChevronDown className="chevron" />
+        <button
+          type="button"
+          className={open ? "selectButton open" : "selectButton"}
+          onClick={() => setOpen((current) => !current)}
+        >
+          <span>{selected?.label || placeholder}</span>
+          <ChevronDown className="chevron" />
+        </button>
+        {open && (
+          <div className="selectMenu">
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={option.value === value ? "selectOption selected" : "selectOption"}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpen(false);
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function ActionButton({ children, variant = "primary", onClick, disabled = false }) {
+function SegmentField({ label, value, onChange, options }) {
+  return (
+    <div className="field">
+      <label>{label}</label>
+      <div className="segments">
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={option.value === value ? "segment active" : "segment"}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActionButton({ children, icon: Icon, variant = "primary", onClick, disabled = false }) {
   return (
     <button type="button" className={`action ${variant}`} onClick={onClick} disabled={disabled}>
+      {Icon ? <Icon size={17} strokeWidth={2.4} /> : null}
       {children}
     </button>
   );
@@ -406,22 +448,21 @@ function App() {
       <div className="phone">
         <div className="scroll">
           <section className="hero">
-            <h1>NPB Team Stats Explorer</h1>
-            <p>2000-latest</p>
+            <h1>NPB Stats</h1>
+            <p>Data from 2000 to latest.</p>
           </section>
 
           <section>
-            <h2 className="sectionTitle">Filters</h2>
             <div className="filters">
+              <SegmentField label="Type" value={pendingType} onChange={setPendingType} options={TYPE_OPTIONS} />
               <div className="grid2">
                 <SelectField label="League" value={pendingLeague} onChange={handleLeagueChange} options={LEAGUE_OPTIONS} placeholder="Select league" />
                 <SelectField label="Team" value={pendingTeamId} onChange={setPendingTeamId} options={filteredTeams} placeholder="Select team" />
               </div>
               <SelectField label="Year" value={pendingYear} onChange={setPendingYear} options={yearOptions} placeholder="Select year" />
-              <SelectField label="Types" value={pendingType} onChange={setPendingType} options={TYPE_OPTIONS} placeholder="Select types" />
               <div className="grid2">
-                <ActionButton onClick={() => void runSearch()} disabled={loadingSeason}>Apply</ActionButton>
-                <ActionButton variant="secondary" onClick={clearFilters} disabled={loadingSeason}>Clear</ActionButton>
+                <ActionButton icon={Search} onClick={() => void runSearch()} disabled={loadingSeason}>Apply</ActionButton>
+                <ActionButton icon={RotateCcw} variant="secondary" onClick={clearFilters} disabled={loadingSeason}>Clear</ActionButton>
               </div>
             </div>
           </section>
