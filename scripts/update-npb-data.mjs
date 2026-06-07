@@ -9,7 +9,8 @@ const TABLES = {
   batting: {
     pageUrl: "https://proeyekyuu.com/ja/player-batting-stats-jp/",
     tableId: 11,
-    output: "npb-batting.json",
+    output: "npb-batting-current.json",
+    legacyOutput: "npb-batting.json",
     columnCount: 41,
     defaultOrderColumn: 14,
     nonQualifiedColumn: 7,
@@ -18,7 +19,8 @@ const TABLES = {
   pitching: {
     pageUrl: "https://proeyekyuu.com/ja/player-pitching-stats-jp/",
     tableId: 17,
-    output: "npb-pitching.json",
+    output: "npb-pitching-current.json",
+    legacyOutput: "npb-pitching.json",
     columnCount: 52,
     defaultOrderColumn: 15,
     nonQualifiedColumn: 6,
@@ -32,24 +34,31 @@ const TEAM_MAP = new Map([
   ["タイガース", { id: "tigers", code: "T" }],
   ["阪神タイガース", { id: "tigers", code: "T" }],
   ["ベイスターズ", { id: "baystars", code: "DB" }],
+  ["横浜ベイスターズ", { id: "baystars", code: "DB" }],
   ["横浜DeNAベイスターズ", { id: "baystars", code: "DB" }],
   ["カープ", { id: "carp", code: "C" }],
   ["広島東洋カープ", { id: "carp", code: "C" }],
   ["スワローズ", { id: "swallows", code: "S" }],
+  ["ヤクルトスワローズ", { id: "swallows", code: "S" }],
   ["東京ヤクルトスワローズ", { id: "swallows", code: "S" }],
   ["ドラゴンズ", { id: "dragons", code: "D" }],
   ["中日ドラゴンズ", { id: "dragons", code: "D" }],
   ["ホークス", { id: "hawks", code: "H" }],
+  ["福岡ダイエーホークス", { id: "hawks", code: "H" }],
   ["福岡ソフトバンクホークス", { id: "hawks", code: "H" }],
   ["ファイターズ", { id: "fighters", code: "F" }],
+  ["日本ハムファイターズ", { id: "fighters", code: "F" }],
   ["北海道日本ハムファイターズ", { id: "fighters", code: "F" }],
   ["マリーンズ", { id: "marines", code: "M" }],
   ["千葉ロッテマリーンズ", { id: "marines", code: "M" }],
   ["イーグルス", { id: "eagles", code: "E" }],
   ["東北楽天ゴールデンイーグルス", { id: "eagles", code: "E" }],
   ["バファローズ", { id: "buffaloes", code: "B" }],
+  ["大阪近鉄バファローズ", { id: "buffaloes", code: "B" }],
+  ["オリックス・ブルーウェーブ", { id: "buffaloes", code: "B" }],
   ["オリックス・バファローズ", { id: "buffaloes", code: "B" }],
   ["ライオンズ", { id: "lions", code: "L" }],
+  ["西武ライオンズ", { id: "lions", code: "L" }],
   ["埼玉西武ライオンズ", { id: "lions", code: "L" }],
 ]);
 
@@ -247,11 +256,15 @@ async function updateOne(kind) {
     .filter((row) => row.player && row.year && row.team));
 
   await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(path.join(DATA_DIR, config.output), `${JSON.stringify({
+  const payload = `${JSON.stringify({
     source: config.pageUrl,
     updatedAt: new Date().toISOString(),
     rows,
-  }, null, 2)}\n`);
+  }, null, 2)}\n`;
+  await writeFile(path.join(DATA_DIR, config.output), payload);
+  if (config.legacyOutput) {
+    await writeFile(path.join(DATA_DIR, config.legacyOutput), payload);
+  }
 
   console.log(`Wrote ${rows.length} ${kind} rows to ${config.output}`);
 }
