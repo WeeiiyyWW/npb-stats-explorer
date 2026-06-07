@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "update:npb": "node scripts/update-npb-data.mjs"
+    "update:npb": "node scripts/update-npb-data.mjs",
+    "import:history": "node scripts/import-npb-history.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",
