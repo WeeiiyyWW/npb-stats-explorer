@@ -97,13 +97,17 @@ const dataCache = new Map();
 
 async function fetchData(type) {
   if (dataCache.has(type)) return dataCache.get(type);
-  const file = type === "pitchers" ? "npb-pitching.json" : "npb-batting.json";
-  const request = fetch(`/data/${file}`)
-    .then((res) => {
-      if (!res.ok) throw new Error(`Unable to load ${file}`);
-      return res.json();
-    })
-    .then((payload) => payload.rows || []);
+  const files = type === "pitchers"
+    ? ["npb-pitching-history.json", "npb-pitching-current.json"]
+    : ["npb-batting-history.json", "npb-batting-current.json"];
+  const request = Promise.all(files.map((file) => (
+    fetch(`/data/${file}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Unable to load ${file}`);
+        return res.json();
+      })
+      .then((payload) => payload.rows || [])
+  ))).then((groups) => groups.flat());
   dataCache.set(type, request);
   return request;
 }
