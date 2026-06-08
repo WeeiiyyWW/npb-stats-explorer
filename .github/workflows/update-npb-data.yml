@@ -3,7 +3,10 @@ name: Update NPB data
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 21 * * *"
+    # GitHub Actions cron uses UTC.
+    # Taiwan time: 12:00 and 14:00.
+    - cron: "0 4 * * *"
+    - cron: "0 6 * * *"
 
 permissions:
   contents: write
