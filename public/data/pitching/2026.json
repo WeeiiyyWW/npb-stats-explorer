@@ -1,6 +1,6 @@
 {
   "source": "https://proeyekyuu.com/ja/player-pitching-stats-jp/",
-  "updatedAt": "2026-06-14T11:47:19.853Z",
+  "updatedAt": "2026-06-14T12:29:48.785Z",
   "rows": [
     {
       "personId": "21925157",
@@ -6737,32 +6737,6 @@
       "hr9": "1.14"
     },
     {
-      "personId": "61765153",
-      "player": "河村 説人",
-      "teamId": "marines",
-      "team": "マリーンズ",
-      "teamCode": "ロ",
-      "year": "2026",
-      "imageUrl": "https://proeyekyuu.com/wp-content/uploads/PlayerPictures/2026/2026_ロ_058_61765153.jpg",
-      "g": "1",
-      "gs": "1",
-      "ip": "6.0",
-      "w": "0",
-      "l": "0",
-      "era": "1.50",
-      "whip": "0.67",
-      "h": "4",
-      "er": "1",
-      "hld": "0",
-      "sv": "0",
-      "so": "5",
-      "bb": "0",
-      "k9": "7.50",
-      "bb9": "0.00",
-      "kbb": "-",
-      "hr9": "0.00"
-    },
-    {
       "personId": "41945155",
       "player": "佐藤 隼輔",
       "teamId": "lions",
@@ -6786,6 +6760,32 @@
       "k9": "5.25",
       "bb9": "1.50",
       "kbb": "3.50",
+      "hr9": "0.00"
+    },
+    {
+      "personId": "61765153",
+      "player": "河村 説人",
+      "teamId": "marines",
+      "team": "マリーンズ",
+      "teamCode": "ロ",
+      "year": "2026",
+      "imageUrl": "https://proeyekyuu.com/wp-content/uploads/PlayerPictures/2026/2026_ロ_058_61765153.jpg",
+      "g": "1",
+      "gs": "1",
+      "ip": "6.0",
+      "w": "0",
+      "l": "0",
+      "era": "1.50",
+      "whip": "0.67",
+      "h": "4",
+      "er": "1",
+      "hld": "0",
+      "sv": "0",
+      "so": "5",
+      "bb": "0",
+      "k9": "7.50",
+      "bb9": "0.00",
+      "kbb": "-",
       "hr9": "0.00"
     },
     {
