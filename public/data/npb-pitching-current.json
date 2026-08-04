@@ -1,6 +1,6 @@
 {
   "source": "https://proeyekyuu.com/ja/player-pitching-stats-jp/",
-  "updatedAt": "2026-08-04T06:27:43.813Z",
+  "updatedAt": "2026-08-04T08:46:15.296Z",
   "rows": [
     {
       "personId": "21925157",
@@ -1927,32 +1927,6 @@
       "hr9": "1.80"
     },
     {
-      "personId": "21525116",
-      "player": "唐川 侑己",
-      "teamId": "marines",
-      "team": "マリーンズ",
-      "teamCode": "ロ",
-      "year": "2026",
-      "imageUrl": "https://proeyekyuu.com/wp-content/uploads/PlayerPictures/2026/2026_ロ_019_21525116.jpg",
-      "g": "1",
-      "gs": "1",
-      "ip": "5.0",
-      "w": "0",
-      "l": "1",
-      "era": "7.20",
-      "whip": "1.20",
-      "h": "5",
-      "er": "4",
-      "hld": "0",
-      "sv": "0",
-      "so": "4",
-      "bb": "1",
-      "k9": "7.20",
-      "bb9": "1.80",
-      "kbb": "4.00",
-      "hr9": "5.40"
-    },
-    {
       "personId": "81985159",
       "player": "庄司 陽斗",
       "teamId": "baystars",
@@ -1977,6 +1951,32 @@
       "bb9": "1.80",
       "kbb": "3.00",
       "hr9": "1.80"
+    },
+    {
+      "personId": "21525116",
+      "player": "唐川 侑己",
+      "teamId": "marines",
+      "team": "マリーンズ",
+      "teamCode": "ロ",
+      "year": "2026",
+      "imageUrl": "https://proeyekyuu.com/wp-content/uploads/PlayerPictures/2026/2026_ロ_019_21525116.jpg",
+      "g": "1",
+      "gs": "1",
+      "ip": "5.0",
+      "w": "0",
+      "l": "1",
+      "era": "7.20",
+      "whip": "1.20",
+      "h": "5",
+      "er": "4",
+      "hld": "0",
+      "sv": "0",
+      "so": "4",
+      "bb": "1",
+      "k9": "7.20",
+      "bb9": "1.80",
+      "kbb": "4.00",
+      "hr9": "5.40"
     },
     {
       "personId": "41045136",
