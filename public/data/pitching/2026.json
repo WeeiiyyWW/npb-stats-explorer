@@ -1,6 +1,6 @@
 {
   "source": "https://proeyekyuu.com/ja/player-pitching-stats-jp/",
-  "updatedAt": "2026-08-26T04:38:50.105Z",
+  "updatedAt": "2026-08-26T06:56:46.595Z",
   "rows": [
     {
       "personId": "21925157",
@@ -9519,32 +9519,6 @@
       "hr9": "0.00"
     },
     {
-      "personId": "73375157",
-      "player": "矢澤 宏太",
-      "teamId": "fighters",
-      "team": "ファイターズ",
-      "teamCode": "日",
-      "year": "2026",
-      "imageUrl": "https://proeyekyuu.com/wp-content/uploads/PlayerPictures/2026/2026_日_012_73375157.jpg",
-      "g": "1",
-      "gs": "0",
-      "ip": "0.1",
-      "w": "0",
-      "l": "0",
-      "era": "0.00",
-      "whip": "6.00",
-      "h": "1",
-      "er": "0",
-      "hld": "0",
-      "sv": "0",
-      "so": "0",
-      "bb": "1",
-      "k9": "0.00",
-      "bb9": "27.00",
-      "kbb": "0.00",
-      "hr9": "0.00"
-    },
-    {
       "personId": "73175150",
       "player": "村上 泰斗",
       "teamId": "hawks",
@@ -9568,6 +9542,32 @@
       "k9": "27.00",
       "bb9": "9.00",
       "kbb": "3.00",
+      "hr9": "0.00"
+    },
+    {
+      "personId": "73375157",
+      "player": "矢澤 宏太",
+      "teamId": "fighters",
+      "team": "ファイターズ",
+      "teamCode": "日",
+      "year": "2026",
+      "imageUrl": "https://proeyekyuu.com/wp-content/uploads/PlayerPictures/2026/2026_日_012_73375157.jpg",
+      "g": "1",
+      "gs": "0",
+      "ip": "0.1",
+      "w": "0",
+      "l": "0",
+      "era": "0.00",
+      "whip": "6.00",
+      "h": "1",
+      "er": "0",
+      "hld": "0",
+      "sv": "0",
+      "so": "0",
+      "bb": "1",
+      "k9": "0.00",
+      "bb9": "27.00",
+      "kbb": "0.00",
       "hr9": "0.00"
     }
   ]
